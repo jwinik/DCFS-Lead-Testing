@@ -1,0 +1,674 @@
+---
+title: "DCFS Maps 8 - 27 Data"
+author: 
+- "Daniel Abrams Law Clinic"
+- "Jason Winik"
+output: pdf_document
+---
+```{r, echo=FALSE, include= FALSE}
+library(devtools)
+library(choroplethrZip)
+library(choroplethr)
+library(choroplethrMaps)
+library(tidyverse)
+library(usmap)
+library(cowplot)
+library(ggmap)
+library(ggplot2)
+library(kableExtra)
+library(showtext)
+library(extrafont)
+library(waffle)
+#font_import("C:/Windows/Fonts")
+
+df <- read.csv('C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/DCFS_clean_8_27.csv')
+#filter NA's in df addresses
+
+#filter non-IL addresses
+
+df_zip <- read.csv('C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/DCFS_zip_8_27.csv')
+df_county <- read.csv('C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/DCFS_county_8_27.csv')
+  
+
+#add fips
+df_county$fips <- fips("IL", county = df_county$county)
+
+
+```
+
+# DCFS Lead Analysis
+
+# Latest Test Positive (Required Facilities)
+\begin{itemize}
+  \item Facilities required to test for lead that most recently tested positive for lead. A facility that is required to test meets the following criteria:
+    \subitem Building date prior to January 1, 2000
+    \subitem Provides childcare services for children ages 0 to 6.
+  \item The \textbf{Latest Test Positive Percent} maps show what percentage of required facilities most recently tested positive for lead, $$\frac{Number\ of\ Positive}{Number\ of\ Positive + Number\ of\ Negative}$$ The \textbf{Latest Test Positive Count} maps show how many facilities tested positive for lead, of those required to test.
+\end{itemize}
+
+# First Test Positive (All Facilities)
+\begin{itemize}
+  \item The \textbf{Positive First Test (Percent)} maps show what percentage of facilities tested positive for lead on their first test, regardless of whether they were required to test based on the building age and age range of services offered $$\frac{Number\ of\ Positive}{Number\ of\ Positive\ +\ Number\ of\ Negative}$$
+  \item The \textbf{Positive First Test (Count)} maps show how many facilities tested positive for lead.
+\end{itemize}
+
+# Should have Tested but Did Not (Required Facilities)
+\begin{itemize}
+  \item Facilities that are required to test for lead, but have yet to do so. A facility that is required to test meets the following criteria:
+    \subitem Building date prior to January 1, 2000
+    \subitem Provides childcare services for children ages 0 to 6.
+    \subitem Note: This does NOT include facilities without a building date or no information about the age of the children services are provided for. This figures only include facilities we know for a fact needed to test, but did not. 
+\end{itemize}
+
+
+```{r, include=FALSE}
+# FIPS Code Groups for Choropleth Maps
+state = 'illinois'
+cook_fips <- 17031
+rockford_fips <- 17201
+peoria_fips <- 17143
+quincy_fips <- 17001
+champaign_fips <- 17019
+metro_fips <- c(17013, 17027, 17083, 17117, 17119, 17133, 17163) #bond, calhoun, clinton, jersey, macoupin, madison, monroe, st.clair
+metro_msa <- 'St. Louis, MO-IL'
+cook_will_dupage_fips <- c(17031,17197,17043, 17097)
+
+```
+
+## Latest Test Positive Count
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=11, height = 12}
+#setup county
+ 
+ltp_count_county <- df_county
+names(ltp_count_county)[names(ltp_count_county)== 'fips'] <- "region"
+names(ltp_count_county)[names(ltp_count_county)== 'ltp_count_bucket'] <- "value"
+
+#ltp_count_county$value <- as.numeric(ltp_count_county$value)
+ltp_count_county$region <- as.numeric(ltp_count_county$region)  
+
+#Setup Zip
+ltp_count_zip <- df_zip %>%
+  mutate(region = as.character(zip))
+#(ltp_count_zip)[names(ltp_count_zip)== 'zip'] <- "region"
+names(ltp_count_zip)[names(ltp_count_zip)== 'ltp_count_bucket'] <- "value"
+
+#ltp_count_zip$value <- as.numeric(ltp_count_zip$value)
+#ltp_count_zip$region <- as.numeric(as.character(ltp_count_zip$region))
+#ltp_count_zip[,"region"] <- as.numeric(factor(ltp_count_zip[,"region"]))
+
+#Illinois
+IL_latest_count <- county_choropleth(ltp_count_county,
+               state_zoom = state,
+               legend = "Count",
+               num_colors = 7) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Latest Test Exceeding Limit: Illinois (County)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+IL_latest_count
+
+
+#Chicago
+chi_latest_count <- zip_choropleth(ltp_count_zip,
+               county_zoom = cook_fips,
+               title = "Latest Test Positive: Cook County",
+               legend = "Count",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Latest Test Exceeding Limit: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+chi_latest_count
+
+
+```
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_count_Illinois.svg")
+IL_latest_count
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_count_cook.svg")
+chi_latest_count
+dev.off()
+
+
+
+```
+
+
+\newpage
+
+# Should Have Tested But Didn't
+
+
+```{r echo=FALSE, fig.width=10, message=FALSE, warning=FALSE}
+ 
+
+# county
+not_tested_county <- df_county
+names(not_tested_county)[names(not_tested_county)== 'fips'] <- "region"
+names(not_tested_county)[names(not_tested_county)== 'should_bucket'] <- "value"
+
+
+not_tested_county$region <- as.numeric(not_tested_county$region)
+
+#zip 
+
+not_tested_zip <- df_zip
+names(not_tested_zip)[names(not_tested_zip)== 'zip'] <- "region"
+names(not_tested_zip)[names(not_tested_zip)== 'should_bucket'] <- "value"
+
+
+#not_tested_zip$value <- as.numeric(not_tested_zip$value) 
+not_tested_zip$region <- as.character(not_tested_zip$region) 
+view(not_tested_zip)
+#Illinois
+
+IL_should <- county_choropleth(not_tested_county,
+                               state_zoom = state,
+                               title = "Should Have Been Tested (County): Illinois",
+                               num_colors = 8) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Should Have Been Tested: Illinois (County)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+IL_should
+
+
+#Chicago
+chi_should <- zip_choropleth(not_tested_zip,
+               county_zoom = cook_fips,
+               title = "Should Have Been Tested (Zip): Cook County",
+               legend = "Count",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Should Have Been Tested: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+chi_should
+
+
+
+
+```
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/should_Illinois.svg")
+IL_should
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/shouldt_cook.svg")
+chi_should
+dev.off()
+
+
+
+```
+
+# Any Test Positive (Count) 
+```{r, echo=FALSE, warning=FALSE, message = FALSE, fig.width=10, height = 12}
+#county setup
+atp_count_county <- df_county
+
+names(atp_count_county)[names(atp_count_county)== 'fips'] <- "region"
+names(atp_count_county)[names(atp_count_county)== 'atp_count_bucket'] <- "value"
+atp_count_county <- atp_count_county[c("region", "value")]
+
+atp_count_county$region <- as.numeric(atp_count_county$region)
+
+
+#setup map - zip
+
+atp_count_zip <- df_zip
+names(atp_count_zip)[names(atp_count_zip)== 'zip'] <- "region"
+names(atp_count_zip)[names(atp_count_zip)== 'atp_count_bucket'] <- "value"
+
+
+#atp_count_zip$value <- as.numeric(atp_count_zip$value)
+atp_count_zip$region <- as.character(atp_count_zip$region)
+
+#Illinois
+IL_ATP_count <- county_choropleth(atp_count_county,
+               state_zoom = state,
+               title = "Any Test Exceeding Limit Count by County: Illinois",
+               legend = "Count",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Any Test Exceeding Limit Count: Illinois (County)")+ theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+
+
+#Chicago
+chi_ATP_count <- zip_choropleth(atp_count_zip,
+               county_zoom = cook_fips,
+               title = "Any Test Exceeding Limit Count by Zip: Cook County",
+               legend = "Count",
+               num_colors = ) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Any Test Exceeding Limit Count: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+
+
+
+
+IL_ATP_count
+chi_ATP_count
+
+# 17015, 17013, 17027, 17083, 170117, 170119, 170133, 170163
+```
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_count_Illinois.svg")
+IL_ATP_count
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_count_cook.svg")
+chi_ATP_count
+dev.off()
+
+
+```
+
+
+
+
+
+# ATP Children Maps
+
+```{r, echo=FALSE, warning=FALSE, message = FALSE, fig.width=11, height = 12}
+#county setup
+atp_max_county <- df_county
+
+names(atp_max_county)[names(atp_max_county)== 'fips'] <- "region"
+names(atp_max_county)[names(atp_max_county)== 'atp_mc_bucket'] <- "value"
+atp_max_county <- atp_max_county[c("region", "value")]
+
+atp_max_county$region <- as.numeric(atp_max_county$region)
+
+
+#setup map - zip
+
+atp_max_zip <- df_zip
+names(atp_max_zip)[names(atp_max_zip)== 'zip'] <- "region"
+names(atp_max_zip)[names(atp_max_zip)== 'atp_mc_bucket'] <- "value"
+
+atp_max_zip$region <- as.character(atp_max_zip$region)
+#atp_max_county$value <- as.numeric(atp_max_county$value)
+
+
+#Illinois
+IL_ATP_child_count <- county_choropleth(atp_max_county,
+               state_zoom = state,
+               title = "Max Capacity at Facilities Exceeding Limit: Illinois (County)",
+               legend = "Number of Children",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Number of Children", palette='YlOrRd')+    ggtitle("Max Capacity at Facilities Exceeding Limit: Illinois (County)")+ theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+IL_ATP_child_count
+
+#Chicago
+chi_ATP_child_count <- zip_choropleth(atp_max_zip,
+               county_zoom = cook_fips,
+               title = "Max Capacity of Children at Facilities that Tested Exceeding Limit by Zip: Cook County",
+               legend = "Number of Children",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Number of Children", palette='YlOrRd')+    ggtitle("Max Capacity at Facilities Exceeding Limit: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+chi_ATP_child_count
+
+```
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_child_count_Illinois.svg")
+IL_ATP_child_count
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_child_count_cook.svg")
+chi_ATP_child_count
+dev.off()
+
+
+```
+
+# LTP Children Maps
+
+```{r, echo=FALSE, warning=FALSE, message = FALSE, fig.width=11, height = 12}
+#county setup
+ltp_max_county <- df_county
+
+names(ltp_max_county)[names(ltp_max_county)== 'fips'] <- "region"
+names(ltp_max_county)[names(ltp_max_county)== 'ltp_mc_bucket'] <- "value"
+ltp_max_county <- ltp_max_county[c("region", "value")]
+
+ltp_max_county$region <- as.numeric(ltp_max_county$region)
+
+
+#setup map - zip
+
+ltp_max_zip <- df_zip
+names(ltp_max_zip)[names(ltp_max_zip)== 'zip'] <- "region"
+names(ltp_max_zip)[names(ltp_max_zip)== 'ltp_mc_bucket'] <- "value"
+
+ltp_max_zip$region <- as.character(ltp_max_zip$region)
+#ltp_max_county$value <- as.numeric(ltp_max_county$value)
+
+
+#Illinois
+IL_LTP_child_count <- county_choropleth(ltp_max_county,
+               state_zoom = state,
+               title = "Max Capacity of Children at Facilities Exceeding Limit: Illinois (County)",
+               legend = "Number of Children",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Number of Children", palette='YlOrRd')+    ggtitle("Max Capacity of Children, Latest Test Exceeding Limit: Illinois (County)")+ theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+IL_LTP_child_count
+
+#Chicago
+chi_LTP_child_count <- zip_choropleth(ltp_max_zip,
+               county_zoom = cook_fips,
+               title = "Max Capacity, Latest Test Positive Facilities by Zip: Cook County",
+               legend = "Number of Children",
+               num_colors = 9) +
+  scale_fill_brewer(name = "Number of Children", palette='YlOrRd')+    ggtitle("Max Capacity of Children, Latest Test Exceeding Limit: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+chi_LTP_child_count
+
+```
+
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_child_count_Illinois.svg")
+IL_LTP_child_count
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_child_count_cook.svg")
+chi_LTP_child_count
+dev.off()
+
+
+```
+
+
+
+\newpage
+
+
+\newpage
+
+# Should Have Tested But Didn't
+
+
+```{r echo=FALSE, fig.width=10, message=FALSE, warning=FALSE}
+ 
+
+# county
+not_tested_county <- df_county
+names(not_tested_county)[names(not_tested_county)== 'fips'] <- "region"
+names(not_tested_county)[names(not_tested_county)== 'should_bucket'] <- "value"
+
+
+not_tested_county$region <- as.numeric(not_tested_county$region)
+
+#zip 
+
+not_tested_zip <- df_zip
+names(not_tested_zip)[names(not_tested_zip)== 'zip'] <- "region"
+names(not_tested_zip)[names(not_tested_zip)== 'should_bucket'] <- "value"
+
+
+#not_tested_zip$value <- as.numeric(not_tested_zip$value) 
+not_tested_zip$region <- as.character(not_tested_zip$region) 
+
+#Illinois
+
+IL_should <- county_choropleth(not_tested_county,
+                               state_zoom = state,
+                               title = "Should Have Been Tested (County): Illinois",
+                               num_colors = 8) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Should Have Been Tested: Illinois (County)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+IL_should
+
+
+#Chicago
+chi_should <- zip_choropleth(not_tested_zip,
+               county_zoom = cook_fips,
+               title = "Should Have Been Tested (Zip): Cook County",
+               legend = "Count",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Should Have Been Tested: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+chi_should
+
+
+
+
+```
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/should_Illinois.svg")
+IL_should
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/shouldt_cook.svg")
+chi_should
+dev.off()
+
+
+```
+
+# Any Test Positive (Count) 
+```{r, echo=FALSE, warning=FALSE, message = FALSE, fig.width=10, height = 12}
+#county setup
+atp_count_county <- df_county
+
+names(atp_count_county)[names(atp_count_county)== 'fips'] <- "region"
+names(atp_count_county)[names(atp_count_county)== 'atp_count_bucket'] <- "value"
+atp_count_county <- atp_count_county[c("region", "value")]
+
+atp_count_county$region <- as.numeric(atp_count_county$region)
+
+
+#setup map - zip
+
+atp_count_zip <- df_zip
+names(atp_count_zip)[names(atp_count_zip)== 'zip'] <- "region"
+names(atp_count_zip)[names(atp_count_zip)== 'atp_count_bucket'] <- "value"
+
+
+#atp_count_zip$value <- as.numeric(atp_count_zip$value)
+atp_count_zip$region <- as.character(atp_count_zip$region)
+
+#Illinois
+IL_ATP_count <- county_choropleth(atp_count_county,
+               state_zoom = state,
+               title = "Any Test Exceeding Limit Count by County: Illinois",
+               legend = "Count",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Any Test Exceeding Limit Count: Illinois (County)")+ theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+
+
+#Chicago
+chi_ATP_count <- zip_choropleth(atp_count_zip,
+               county_zoom = cook_fips,
+               title = "Any Test Exceeding Limit Count by Zip: Cook County",
+               legend = "Count",
+               num_colors = ) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Any Test Exceeding Limit Count: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+
+
+IL_ATP_count
+chi_ATP_count
+
+# 17015, 17013, 17027, 17083, 170117, 170119, 170133, 170163
+```
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_count_Illinois.svg")
+IL_ATP_count
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_count_cook.svg")
+chi_ATP_count
+dev.off()
+
+```
+
+
+# ATP Children Maps
+
+```{r, echo=FALSE, warning=FALSE, message = FALSE, fig.width=11, height = 12}
+#county setup
+atp_max_county <- df_county
+
+names(atp_max_county)[names(atp_max_county)== 'fips'] <- "region"
+names(atp_max_county)[names(atp_max_county)== 'atp_mc_bucket'] <- "value"
+atp_max_county <- atp_max_county[c("region", "value")]
+
+atp_max_county$region <- as.numeric(atp_max_county$region)
+
+
+#setup map - zip
+
+atp_max_zip <- df_zip
+names(atp_max_zip)[names(atp_max_zip)== 'zip'] <- "region"
+names(atp_max_zip)[names(atp_max_zip)== 'atp_mc_bucket'] <- "value"
+
+atp_max_zip$region <- as.character(atp_max_zip$region)
+#atp_max_county$value <- as.numeric(atp_max_county$value)
+
+
+#Illinois
+IL_ATP_child_count <- county_choropleth(atp_max_county,
+               state_zoom = state,
+               title = "Max Capacity at Facilities Exceeding Limit: Illinois (County)",
+               legend = "Number of Children",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Number of Children", palette='YlOrRd')+    ggtitle("Max Capacity at Facilities Exceeding Limit: Illinois (County)")+ theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+IL_ATP_child_count
+
+#Chicago
+chi_ATP_child_count <- zip_choropleth(atp_max_zip,
+               county_zoom = cook_fips,
+               title = "Max Capacity of Children at Facilities that Tested Exceeding Limit by Zip: Cook County",
+               legend = "Number of Children",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Number of Children", palette='YlOrRd')+    ggtitle("Max Capacity at Facilities Exceeding Limit: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+chi_ATP_child_count
+
+```
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_child_count_Illinois.svg")
+IL_ATP_child_count
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_child_count_cook.svg")
+chi_ATP_child_count
+dev.off()
+
+```
+
+# LTP Children Maps
+
+```{r, echo=FALSE, warning=FALSE, message = FALSE, fig.width=12, height = 12}
+#county setup
+ltp_max_county <- df_county
+
+names(ltp_max_county)[names(ltp_max_county)== 'fips'] <- "region"
+names(ltp_max_county)[names(ltp_max_county)== 'ltp_mc_bucket'] <- "value"
+ltp_max_county <- ltp_max_county[c("region", "value")]
+
+ltp_max_county$region <- as.numeric(ltp_max_county$region)
+
+
+#setup map - zip
+
+ltp_max_zip <- df_zip
+names(ltp_max_zip)[names(ltp_max_zip)== 'zip'] <- "region"
+names(ltp_max_zip)[names(ltp_max_zip)== 'ltp_mc_bucket'] <- "value"
+
+ltp_max_zip$region <- as.character(ltp_max_zip$region)
+#ltp_max_county$value <- as.numeric(ltp_max_county$value)
+
+
+#Illinois
+IL_LTP_child_count <- county_choropleth(ltp_max_county,
+               state_zoom = state,
+               title = "Max Capacity of Children at Facilities Exceeding Limit: Illinois (County)",
+               legend = "Number of Children",
+               num_colors = 8) +
+  scale_fill_brewer(name = "Number of Children", palette='YlOrRd')+    ggtitle("Max Capacity of Children, Latest Test Exceeding Limit: Illinois (County)")+ theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+IL_LTP_child_count
+
+#Chicago
+chi_LTP_child_count <- zip_choropleth(ltp_max_zip,
+               county_zoom = cook_fips,
+               title = "Max Capacity, Latest Test Positive Facilities by Zip: Cook County",
+               legend = "Number of Children",
+               num_colors = ) +
+  scale_fill_brewer(name = "Number of Children", palette='YlOrRd')+    ggtitle("Max Capacity of Children, Latest Test Exceeding Limit: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+chi_LTP_child_count
+
+```
+
+
+```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+#Illinois
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_child_count_Illinois.svg")
+IL_LTP_child_count
+dev.off()
+
+#Cook
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_child_count_cook.svg")
+chi_LTP_child_count
+dev.off()
+
+
+```
+
+
+## Waffle Chart
+
+```{r}
+cook_df <- df_county %>%
+  filter(county == "Cook County") %>%
+  summarise(not_positive = sum(required_testing_tested - any_test_positive_req),
+            any_test_positive_req = sum(any_test_positive_req),
+            latest_test_positive_req = sum(latest_test_positive_required))
+
+cook_df <- gather(cook_df, testing_type, count_facilities, not_positive:latest_test_positive_req)
+
+cook_df$count_facilities <- cook_df$count_facilities / 20
+
+waffle(cook_df, rows = 5, size = .5, legend_pos = "bottom",
+  colors = c("#c7d4b6", "#a3aabd", "#a0d0de"))
+
+
+
+
+
+```
+
+# Required to Test
+
+```{r}
+cook_df_req <- df_county %>%
+  filter(county == "Cook County") %>%
+  summarise(any_test_neg_req = sum(required_testing_tested-any_test_positive_req),
+            no_test = sum(required_testing_not_tested),
+            any_test_positive_req = sum(any_test_positive_req))
+
+cook_df <- gather(cook_df_req, testing_type, count_facilities, 1:3)
+
+cook_df$count_facilities <- cook_df$count_facilities / 20
+
+required_waffle <- waffle(cook_df, rows = 5, size = .5, legend_pos = "bottom",
+  colors = c("#c7d4b6", "gold1", "orangered4"))
+
+
+
+
+svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/required_waffles.svg")
+required_waffle
+dev.off()
+
+```
+
+
+
