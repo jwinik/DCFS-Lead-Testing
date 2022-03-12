@@ -117,14 +117,14 @@ chi_latest_count
 
 ```
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_count_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/LTP_count_Illinois.pdf")
 IL_latest_count
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_count_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/LTP_count_cook.pdf")
 chi_latest_count
 dev.off()
 
@@ -158,7 +158,7 @@ names(not_tested_zip)[names(not_tested_zip)== 'should_bucket'] <- "value"
 
 #not_tested_zip$value <- as.numeric(not_tested_zip$value) 
 not_tested_zip$region <- as.character(not_tested_zip$region) 
-view(not_tested_zip)
+
 #Illinois
 
 IL_should <- county_choropleth(not_tested_county,
@@ -183,14 +183,14 @@ chi_should
 
 ```
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/should_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/should_Illinois.pdf")
 IL_should
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/shouldt_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/should_cook.pdf")
 chi_should
 dev.off()
 
@@ -246,14 +246,14 @@ chi_ATP_count
 # 17015, 17013, 17027, 17083, 170117, 170119, 170133, 170163
 ```
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_count_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_count_Illinois.pdf")
 IL_ATP_count
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_count_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_count_cook.pdf")
 chi_ATP_count
 dev.off()
 
@@ -307,14 +307,14 @@ chi_ATP_child_count
 
 ```
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_child_count_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_child_count_Illinois.pdf")
 IL_ATP_child_count
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_child_count_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_child_count_cook.pdf")
 chi_ATP_child_count
 dev.off()
 
@@ -365,14 +365,14 @@ chi_LTP_child_count
 ```
 
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_child_count_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/LTP_child_count_Illinois.pdf")
 IL_LTP_child_count
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_child_count_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/LTP_child_count_cook.pdf")
 chi_LTP_child_count
 dev.off()
 
@@ -434,14 +434,14 @@ chi_should
 
 ```
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/should_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/should_Illinois.pdf")
 IL_should
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/shouldt_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/shouldt_cook.pdf")
 chi_should
 dev.off()
 
@@ -494,14 +494,14 @@ chi_ATP_count
 # 17015, 17013, 17027, 17083, 170117, 170119, 170133, 170163
 ```
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_count_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_count_Illinois.pdf")
 IL_ATP_count
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_count_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_count_cook.pdf")
 chi_ATP_count
 dev.off()
 
@@ -551,14 +551,14 @@ chi_ATP_child_count
 
 ```
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_child_count_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_child_count_Illinois.pdf")
 IL_ATP_child_count
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/ATP_child_count_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_child_count_cook.pdf")
 chi_ATP_child_count
 dev.off()
 
@@ -608,14 +608,14 @@ chi_LTP_child_count
 ```
 
 
-```{r svg, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_child_count_Illinois.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/LTP_child_count_Illinois.pdf")
 IL_LTP_child_count
 dev.off()
 
 #Cook
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/LTP_child_count_cook.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/LTP_child_count_cook.pdf")
 chi_LTP_child_count
 dev.off()
 
@@ -664,7 +664,7 @@ required_waffle <- waffle(cook_df, rows = 5, size = .5, legend_pos = "bottom",
 
 
 
-svg("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/Exports/required_waffles.svg")
+pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/required_waffles.pdf")
 required_waffle
 dev.off()
 
