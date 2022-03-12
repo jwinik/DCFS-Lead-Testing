@@ -246,7 +246,7 @@ chi_ATP_count
 # 17015, 17013, 17027, 17083, 170117, 170119, 170133, 170163
 ```
 
-```{r pdf, message=FALSE, warning=FALSE, include=FALSE, Lower Resolution, eval=FALSE}
+```{r pdf, echo=FALSE, message=FALSE, warning=FALSE, Lower Resolution, eval=FALSE}
 #Illinois
 pdf("C:/Users/jwini/OneDrive/Documents/Python Scripts/DCFS-Lead-Testing/ATP_count_Illinois.pdf")
 IL_ATP_count
