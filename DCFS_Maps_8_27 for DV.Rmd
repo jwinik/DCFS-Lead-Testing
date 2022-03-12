@@ -165,7 +165,7 @@ IL_should <- county_choropleth(not_tested_county,
                                state_zoom = state,
                                title = "Should Have Been Tested (County): Illinois",
                                num_colors = 8) +
-  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Should Have Been Tested: Illinois (County)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+  scale_fill_brewer(name = "Count of Facilities", palette='BuPu')+    ggtitle("Should Have Been Tested: Illinois (County)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
 IL_should
 
 
@@ -175,7 +175,7 @@ chi_should <- zip_choropleth(not_tested_zip,
                title = "Should Have Been Tested (Zip): Cook County",
                legend = "Count",
                num_colors = 8) +
-  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Should Have Been Tested: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+  scale_fill_brewer(name = "Count of Facilities", palette='BuPu')+    ggtitle("Should Have Been Tested: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
 chi_should
 
 
@@ -621,6 +621,70 @@ dev.off()
 
 
 ```
+
+
+
+
+# Latest Test Positive Choropleth, LTP Children Bubble
+
+```{r, echo=FALSE, warning=FALSE, message = FALSE, fig.width=10, height = 12}
+#county setup
+atp_count_county <- df_county
+
+names(atp_count_county)[names(atp_count_county)== 'fips'] <- "region"
+names(atp_count_county)[names(atp_count_county)== 'atp_count_bucket'] <- "value"
+atp_count_county <- atp_count_county[c("region", "value", "atp_max_capacity_req")]
+
+atp_count_county$region <- as.numeric(atp_count_county$region)
+
+
+bubble <- atp_count_county 
+names(bubble)[names(bubble)== "value"] <- "atp_count_bucket"
+names(bubble)[names(bubble)== "atp_max_capacity_req"] <- "value"
+
+#setup map - zip
+
+atp_count_zip <- df_zip
+names(atp_count_zip)[names(atp_count_zip)== 'zip'] <- "region"
+names(atp_count_zip)[names(atp_count_zip)== 'atp_count_bucket'] <- "value"
+atp_count_zip <- atp_count_zip[c("region", "value", "atp_max_capacity_req")]
+
+#atp_count_zip$value <- as.numeric(atp_count_zip$value)
+atp_count_zip$region <- as.character(atp_count_zip$region)
+
+
+#Illinois
+IL_ATP_count <- county_choropleth(atp_count_county,
+               state_zoom = state,
+               title = "Any Test Exceeding Limit Count by County: Illinois",
+               legend = "Count",
+               num_colors = 8) +
+geom_sf(data = bubble,
+          pch = 21,
+          aes(size = 'value'),
+          fill = alpha("red", 0.7),
+          col = "grey20")+
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Any Test Exceeding Limit Count: Illinois (County)")+ theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+
+
+#Chicago
+chi_ATP_count <- zip_choropleth(atp_count_zip,
+               county_zoom = cook_fips,
+               title = "Any Test Exceeding Limit Count by Zip: Cook County",
+               legend = "Count",
+               num_colors = ) +
+  scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Any Test Exceeding Limit Count: Cook County (Zip)")+      theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
+
+
+IL_ATP_count
+chi_ATP_count
+
+# 17015, 17013, 17027, 17083, 170117, 170119, 170133, 170163
+```
+
+
+
+
 
 
 ## Waffle Chart
