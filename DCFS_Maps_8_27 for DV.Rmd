@@ -659,11 +659,10 @@ IL_ATP_count <- county_choropleth(atp_count_county,
                title = "Any Test Exceeding Limit Count by County: Illinois",
                legend = "Count",
                num_colors = 8) +
-geom_sf(data = bubble,
-          pch = 21,
-          aes(size = 'value'),
+geom_sf(pch = 21,
+          aes(size = 'atp_max_capacity_req'),
           fill = alpha("red", 0.7),
-          col = "grey20")+
+          col = "grey20") +
   scale_fill_brewer(name = "Count of Facilities", palette='YlOrRd')+    ggtitle("Any Test Exceeding Limit Count: Illinois (County)")+ theme(text = element_text(family = "Gotham Medium", color = "#7E0000"))
 
 
